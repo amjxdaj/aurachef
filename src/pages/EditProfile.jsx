@@ -113,7 +113,7 @@ const EditProfile = () => {
                   />
                 </div>
                 
-                {/* <div>
+                <div>
                   <label htmlFor="email" className="block text-white font-medium mb-2">
                     Email
                   </label>
@@ -126,7 +126,7 @@ const EditProfile = () => {
                     className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
                     required
                   />
-                </div> */}
+                </div>
                 
                 <div>
                   <label htmlFor="bio" className="block text-white font-medium mb-2">

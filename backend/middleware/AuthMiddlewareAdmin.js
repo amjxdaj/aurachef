@@ -3,7 +3,7 @@ const  JWT_SECRET  = process.env.JWT_SECRET;
 const User = require("../models/User"); // Assuming User model is here
 
 const adminAuthCheck = async (req, res, next) => {
-  console.log("cheking AUTH  ✅ ")
+  console.log("cheking AUTH of Admin  ✅ ")
   const token = req.header("Authorization");
   if (!token) {
       return res.status(404).json({ message: "Not authenticated" });

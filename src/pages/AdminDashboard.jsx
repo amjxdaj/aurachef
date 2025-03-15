@@ -83,7 +83,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen pt-24 pb-12 ">
       <div className="page-transition max-w-5xl mx-auto px-4">
         <div className="flex flex-col items-center mb-12">
           <div className="relative">

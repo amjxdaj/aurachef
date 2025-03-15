@@ -1,11 +1,13 @@
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --purple-light: #9A7AFF;  /* Original light purple for navbar */
-  --purple-default: #8A5CF6;  /* Original default purple for navbar */
-  --purple-dark: #6E43D2;  /* Original dark purple for navbar */
+  --purple-light: #9A7AFF;
+  --purple-default: #8A5CF6;
+  --purple-dark: #6E43D2;
 }
 
 * {
@@ -16,7 +18,7 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #5B21B6, #6D28D9);
+  background: linear-gradient(135deg, var(--purple-default), var(--purple-light));
   color: #fff;
   overflow-x: hidden;
   min-height: 100vh;

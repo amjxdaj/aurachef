@@ -138,6 +138,7 @@ router.delete("/delete/:id", async (req, res) => {
   }
 });
 
+//Search Recipes by Ingredients
 router.post("/search", async (req, res) => {
   try {
     const { ingredients } = req.body;
@@ -165,6 +166,7 @@ router.post("/search", async (req, res) => {
   }
 });
 
+//Get Recipes Pending Approval for Admin
 router.get("/admin", async (req, res) => {
   try {
     const recipes = await Recipe.find({ status: { $ne: "approved" } }).populate(
@@ -214,6 +216,7 @@ router.patch("/admin/approve/:id", adminAuthCheck, async (req, res) => {
   }
 });
 
+//reject recipe
 router.post("/admin/reject/:id", adminAuthCheck, async (req, res) => {
   try {
     const recipeId = req.params.id;
@@ -235,6 +238,7 @@ router.post("/admin/reject/:id", adminAuthCheck, async (req, res) => {
   }
 });
 
+//grouping all incredients
 router.get("/incredients", async (req, res) => {
   try {
     const ingredients = await Recipe.aggregate([
