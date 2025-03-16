@@ -1,47 +1,51 @@
-
+// src/components/calorie-tracking/FoodLogTable.jsx
 import React from 'react';
+import { Trash2, UtensilsCrossed } from 'lucide-react';
 
-const FoodLogTable = ({ entries, deleteEntry }) => {
+const FoodLogTable = ({ entries, deleteEntry, onReset }) => {
   return (
-    <div className="glass p-8 rounded-2xl">
-      <h2 className="text-2xl font-semibold mb-6">Today's Food Log</h2>
+    <div className="glass p-8 rounded-2xl mb-8">
+      <h2 className="text-2xl font-semibold text-white mb-4">Today's Food Log</h2>
       
       {entries.length === 0 ? (
-        <p className="text-white/80 text-center py-4">No entries yet. Add your first meal above!</p>
+        <div className="text-center py-8">
+          <UtensilsCrossed className="mx-auto text-gray-400 mb-4" size={48} />
+          <p className="text-gray-400">No food entries yet. Add your first meal above!</p>
+        </div>
       ) : (
-        <div className="overflow-x-auto">
+        <>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/20">
-                <th className="text-left py-3 px-4 text-white font-medium">Food</th>
-                <th className="text-center py-3 px-4 text-white font-medium">Meal</th>
-                <th className="text-center py-3 px-4 text-white font-medium">Time</th>
-                <th className="text-center py-3 px-4 text-white font-medium">Calories</th>
-                <th className="text-right py-3 px-4 text-white font-medium">Action</th>
+              <tr className="text-left text-gray-300">
+                <th className="py-2">Food</th>
+                <th className="py-2">Meal</th>
+                <th className="py-2">Time</th>
+                <th className="py-2">Calories</th>
+                <th className="py-2 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
-              {entries.map(entry => (
-                <tr key={entry.id} className="border-b border-white/10 hover:bg-white/5">
-                  <td className="py-3 px-4 text-white">{entry.food}</td>
-                  <td className="py-3 px-4 text-white text-center">{entry.meal}</td>
-                  <td className="py-3 px-4 text-white text-center">{entry.time}</td>
-                  <td className="py-3 px-4 text-white text-center">{entry.calories}</td>
-                  <td className="py-3 px-4 text-right">
+              {entries.map((entry) => (
+                <tr key={entry._id} className="border-t border-white/10 text-white">
+                  <td className="py-3">{entry.food}</td>
+                  <td className="py-3">{entry.meal}</td>
+                  <td className="py-3">{entry.time}</td>
+                  <td className="py-3">{entry.calories}</td>
+                  <td className="py-3 text-center">
                     <button
-                      onClick={() => deleteEntry(entry.id)}
-                      className="text-white/70 hover:text-white transition-colors"
+                      onClick={() => deleteEntry(entry._id)}
+                      className="text-red-400 hover:text-red-300 transition-colors p-2 hover:bg-red-400/10 rounded-full"
+                      title="Delete entry"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                      <Trash2 size={18} />
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+          
+        </>
       )}
     </div>
   );

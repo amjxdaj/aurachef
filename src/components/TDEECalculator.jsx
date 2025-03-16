@@ -157,11 +157,11 @@ const TDEECalculator = ({ onCalorieGoalChange, onUserMetricsChange }) => {
             />
           </div>
           
-          <div>
+          <div >
             <label htmlFor="gender" className="block text-white font-medium mb-2">
               Gender
             </label>
-            <select
+            <select  
               id="gender"
               name="gender"
               value={userDetails.gender}
@@ -169,8 +169,8 @@ const TDEECalculator = ({ onCalorieGoalChange, onUserMetricsChange }) => {
               className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
               required
             >
-              <option value="male">Male</option>
-              <option value="female">Female</option>
+              <option value="male" className="text-black">Male</option>
+              <option value="female" className="text-black">Female</option>
             </select>
           </div>
         </div>
@@ -188,11 +188,11 @@ const TDEECalculator = ({ onCalorieGoalChange, onUserMetricsChange }) => {
               className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
               required
             >
-              <option value="sedentary">Sedentary (little to no exercise)</option>
-              <option value="lightlyActive">Lightly Active (1-3 days/week)</option>
-              <option value="moderatelyActive">Moderately Active (3-5 days/week)</option>
-              <option value="veryActive">Very Active (6-7 days/week)</option>
-              <option value="superActive">Super Active (athlete, hard exercise)</option>
+              <option value="sedentary" className="text-black">Sedentary (little to no exercise)</option>
+              <option value="lightlyActive" className="text-black">Lightly Active (1-3 days/week)</option>
+              <option value="moderatelyActive" className="text-black">Moderately Active (3-5 days/week)</option>
+              <option value="veryActive" className="text-black">Very Active (6-7 days/week)</option>
+              <option value="superActive" className="text-black">Super Active (athlete, hard exercise)</option>
             </select>
           </div>
           
@@ -208,9 +208,9 @@ const TDEECalculator = ({ onCalorieGoalChange, onUserMetricsChange }) => {
               className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
               required
             >
-              <option value="loss">Weight Loss</option>
-              <option value="maintenance">Weight Maintenance</option>
-              <option value="gain">Weight Gain</option>
+              <option value="loss" className="text-black">Weight Loss</option>
+              <option value="maintenance" className="text-black">Weight Maintenance</option>
+              <option value="gain" className="text-black">Weight Gain</option>
             </select>
           </div>
         </div>

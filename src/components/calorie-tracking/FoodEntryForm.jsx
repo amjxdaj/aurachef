@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const FoodEntryForm = ({ newEntry, handleChange, handleSubmit }) => {
@@ -53,25 +52,38 @@ const FoodEntryForm = ({ newEntry, handleChange, handleSubmit }) => {
               onChange={handleChange}
               className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
             >
-              <option value="Breakfast">Breakfast</option>
-              <option value="Lunch">Lunch</option>
-              <option value="Dinner">Dinner</option>
-              <option value="Snack">Snack</option>
+              <option value="Breakfast" className="text-black">Breakfast</option>
+              <option value="Lunch" className="text-black">Lunch</option>
+              <option value="Dinner" className="text-black">Dinner</option>
+              <option value="Snack" className="text-black">Snack</option>
             </select>
           </div>
           
-          <div>
-            <label htmlFor="time" className="block text-white font-medium mb-2">
-              Time (optional)
-            </label>
-            <input
-              id="time"
-              name="time"
-              type="time"
-              value={newEntry.time}
-              onChange={handleChange}
-              className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
-            />
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label htmlFor="time" className="block text-white font-medium mb-2">
+                Time
+              </label>
+              <div className="flex gap-4">
+                <input
+                  id="time"
+                  name="time"
+                  type="time"
+                  value={newEntry.time}
+                  onChange={handleChange}
+                  className="w-full glass bg-white/5 border border-white/20 px-5 py-2 rounded-l-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                />
+                <select
+                  name="period"
+                  value={newEntry.period}
+                  onChange={handleChange}
+                  className="glass bg-white/5 border-l-0 border border-white/20 px-4 py-2 rounded-r-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                >
+                  <option value="am" className="text-black">am</option>
+                  <option value="pm" className="text-black">pm</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
         
