@@ -82,7 +82,7 @@ const SearchBar = ({ onSearch }) => {
         
         <input
           type="search"
-          className="w-full bg-white/20 backdrop-blur-md py-4 pl-12 pr-24 text-white placeholder-white/70 
+          className="w-full bg-white/20 backdrop-blur-md py-4 pl-10 pr-28 text-white placeholder-white/70 
                    outline-none border-2 border-white/10 rounded-full
                    focus:border-white/30 focus:bg-white/30
                    transition-all duration-300 shadow-lg"

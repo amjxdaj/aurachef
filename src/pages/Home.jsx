@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 import HealthBot from "../components/HealthBot";
 import SearchBar from "../components/SearchBar";
 import HealthTip from "../components/HealthTip";
@@ -10,7 +11,7 @@ const Home = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [expandedRecipe, setExpandedRecipe] = useState(null);
-
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleSearch = async (searchIngredients) => {
@@ -158,14 +159,16 @@ const Home = () => {
           </div>
         )}
 
-        <div className="mt-16">
-          <button 
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-            onClick={handleGetStarted}
-          >
-            Get Started
-          </button>
-        </div>
+        {!user && (
+          <div className="mt-16">
+            <button 
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              onClick={handleGetStarted}
+            >
+              Get Started
+            </button>
+          </div>
+        )}
       </div>
 
       {expandedRecipe && (

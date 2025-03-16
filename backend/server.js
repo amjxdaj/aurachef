@@ -6,8 +6,8 @@ const authRoutes = require("./routes/auth");
 const recipeRoutes = require("./routes/recipe");
 const ratingRoutes = require("./routes/rating");
 const favouritesRoutes = require("./routes/favourites");
+const userRoutes = require("./routes/users"); // Updated to match the file name
 const path = require("path");
-
 
 const app = express();
 app.use(express.json());
@@ -19,6 +19,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/recipe", recipeRoutes);
 app.use("/api/rating", ratingRoutes);
 app.use("/api/favourites", favouritesRoutes);
+app.use("/api/users", userRoutes); // Changed from /api/user to /api/users
 
 // Connect to MongoDB
 mongoose

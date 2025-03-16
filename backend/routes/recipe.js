@@ -46,7 +46,7 @@ const parseIngredients = (ingredientsString) => {
   let ingredients = normalized
     // Split by newlines first
     .split('\n')
-    // Then split any remaining items by commas
+    // Then split by commas
     .flatMap(item => item.split(','))
     // Then split by multiple spaces
     .flatMap(item => item.split(/\s{2,}/))
@@ -55,12 +55,62 @@ const parseIngredients = (ingredientsString) => {
       ingredient
         .trim() // Remove leading/trailing whitespace
         .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+        .toLowerCase() // Convert to lowercase for consistent matching
     )
     // Remove empty items
     .filter(ingredient => ingredient.length > 0);
 
   // Remove duplicates and return
   return [...new Set(ingredients)];
+};
+
+// Function to check if ingredients match
+const ingredientsMatch = (searchIngredient, recipeIngredient) => {
+  // Convert both to lowercase for case-insensitive comparison
+  searchIngredient = searchIngredient.toLowerCase().trim();
+  recipeIngredient = recipeIngredient.toLowerCase().trim();
+
+  // Check for exact match first
+  if (searchIngredient === recipeIngredient) {
+    return true;
+  }
+
+  // Split ingredients into words
+  const searchWords = searchIngredient.split(/\s+/);
+  const recipeWords = recipeIngredient.split(/\s+/);
+
+  // Check if all search words appear in recipe words in order
+  let searchIndex = 0;
+  let recipeIndex = 0;
+
+  while (searchIndex < searchWords.length && recipeIndex < recipeWords.length) {
+    if (recipeWords[recipeIndex].includes(searchWords[searchIndex])) {
+      // Only count as match if it's not part of a larger word
+      if (recipeWords[recipeIndex].length <= searchWords[searchIndex].length + 2) {
+        searchIndex++;
+      }
+    }
+    recipeIndex++;
+  }
+
+  return searchIndex === searchWords.length;
+};
+
+// Calculate match percentage between search ingredients and recipe
+const calculateMatchPercentage = (searchIngredients, recipeIngredients) => {
+  // Count matching ingredients
+  const matchedCount = searchIngredients.reduce((count, searchIng) => {
+    return count + (recipeIngredients.some(recipeIng => 
+      ingredientsMatch(searchIng, recipeIng)
+    ) ? 1 : 0);
+  }, 0);
+
+  // Calculate percentages based on both search and recipe ingredients
+  const searchPercentage = (matchedCount / searchIngredients.length) * 100;
+  const recipePercentage = (matchedCount / recipeIngredients.length) * 100;
+
+  // Return the average of both percentages to balance the match
+  return (searchPercentage + recipePercentage) / 2;
 };
 
 // Create a new recipe
@@ -178,21 +228,36 @@ router.delete("/delete/:id", async (req, res) => {
 router.post("/search", async (req, res) => {
   try {
     const { ingredients } = req.body;
+    
+    // Handle empty input
+    if (!ingredients || ingredients.trim() === '') {
+      return res.status(400).json({ message: "No ingredients provided" });
+    }
+
+    // Parse and clean search ingredients
     const searchIngredients = ingredients
-      .split(",")
-      .map((ing) => ing.trim().toLowerCase());
+      .split(',')
+      .map(ing => ing.trim().toLowerCase())
+      .filter(ing => ing.length > 0);
+
+    // If no valid ingredients after parsing
+    if (searchIngredients.length === 0) {
+      return res.status(400).json({ message: "No valid ingredients provided" });
+    }
 
     const recipes = await Recipe.find({ status: "approved" });
-    const matchedRecipes = recipes
-      .map((recipe) => {
-        const matchedCount = recipe.ingredients.filter((ing) =>
-          searchIngredients.includes(ing)
-        ).length;
-        const matchPercentage =
-          (matchedCount / recipe.ingredients.length) * 100;
-        return { ...recipe.toObject(), matchPercentage };
-      })
-      .filter((recipe) => recipe.matchPercentage > 40)
+    
+    const matchedRecipes = recipes.map(recipe => {
+      const recipeIngredients = recipe.ingredients.map(ing => ing.toLowerCase());
+      
+      // Calculate match percentage using the new function
+      const matchPercentage = calculateMatchPercentage(searchIngredients, recipeIngredients);
+
+      return {
+        ...recipe.toObject(),
+        matchPercentage
+      };
+    }).filter(recipe => recipe.matchPercentage > 20)
       .sort((a, b) => b.matchPercentage - a.matchPercentage);
 
     res.status(200).json(matchedRecipes);
@@ -328,6 +393,5 @@ router.post("/admin/pending/:id", adminAuthCheck, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 module.exports = router;
