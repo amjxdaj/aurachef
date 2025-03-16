@@ -107,4 +107,100 @@ router.post("/verify-token", authCheck, async (req, res) => {
   res.status(200).json({ user: req.user, is_authenticated: req.is_authenticated });
 });
 
+
+
+
+
+const { generateOTP, sendOTP } = require("../utils/sendOtp");
+
+router.post("/request-otp", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Generate OTP and set expiration (10 minutes)
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes validity
+
+    await user.save();
+
+    // Send OTP via email
+    await sendOTP(email, otp);
+
+    res.status(200).json({ message: "OTP sent successfully!" });
+  } catch (error) {
+    console.error("❌ Error sending OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+router.post("/verify-otp", async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user || user.otp !== otp || user.otpExpiration < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    // OTP is valid, clear it and generate a password reset token
+    user.otp = null;
+    user.otpExpiration = null;
+    await user.save();
+
+    // Generate a temporary token for password reset
+    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "15m" });
+
+    res.status(200).json({ message: "OTP verified!", resetToken });
+  } catch (error) {
+    console.error("❌ OTP Verification Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+router.post("/reset-password", async (req, res) => {
+  const { newPassword, token } = req.body;
+
+  if (!newPassword || !token) {
+    return res.status(400).json({ message: "New password and token are required" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successfully!" });
+  } catch (error) {
+    console.error("❌ Password Reset Error:", error);
+    res.status(500).json({ message: "Invalid or expired token" });
+  }
+});
+
+
 module.exports = router;
