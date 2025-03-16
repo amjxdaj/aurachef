@@ -13,9 +13,9 @@ const CalorieTracking = () => {
   const navigate = useNavigate();
   const [entries, setEntries] = useState(
     [
-    { id: 1, food: 'Oatmeal with berries', calories: 320, meal: 'Breakfast', time: '08:30' },
-    { id: 2, food: 'Grilled chicken salad', calories: 450, meal: 'Lunch', time: '12:45' },
-    { id: 3, food: 'Apple', calories: 95, meal: 'Snack', time: '15:30' },
+    // { id: 1, food: 'Oatmeal with berries', calories: 320, meal: 'Breakfast', time: '08:30' },
+    // { id: 2, food: 'Grilled chicken salad', calories: 450, meal: 'Lunch', time: '12:45' },
+    // { id: 3, food: 'Apple', calories: 95, meal: 'Snack', time: '15:30' },
   ]
 );
 
@@ -31,7 +31,7 @@ const CalorieTracking = () => {
     height: ''
   });
 
-  const [calorieGoal, setCalorieGoal] = useState(2000);
+  const [calorieGoal, setCalorieGoal] = useState(0);
   const totalCalories = entries.reduce((total, entry) => total + entry.calories, 0);
 
   const handleChange = (e) => {

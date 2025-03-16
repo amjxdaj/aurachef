@@ -35,6 +35,34 @@ const fileFilter = (req, file, cb) => {
 // Multer middleware
 const upload = multer({ storage: fileStorage, fileFilter });
 
+// Function to parse ingredients string into an array
+const parseIngredients = (ingredientsString) => {
+  if (!ingredientsString) return [];
+
+  // First, normalize line endings
+  const normalized = ingredientsString.replace(/\r\n/g, '\n');
+
+  // Split by different possible delimiters
+  let ingredients = normalized
+    // Split by newlines first
+    .split('\n')
+    // Then split any remaining items by commas
+    .flatMap(item => item.split(','))
+    // Then split by multiple spaces
+    .flatMap(item => item.split(/\s{2,}/))
+    // Clean up each ingredient
+    .map(ingredient => 
+      ingredient
+        .trim() // Remove leading/trailing whitespace
+        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    )
+    // Remove empty items
+    .filter(ingredient => ingredient.length > 0);
+
+  // Remove duplicates and return
+  return [...new Set(ingredients)];
+};
+
 // Create a new recipe
 router.post("/create", authCheck, upload.single("image"), async (req, res) => {
   try {
@@ -51,11 +79,19 @@ router.post("/create", authCheck, upload.single("image"), async (req, res) => {
 
     const image = req.file ? req.file.path : null;
 
+    // Parse ingredients using the new function
+    const parsedIngredients = parseIngredients(ingredients);
+    
+    // Parse instructions similarly to handle different formats
+    const parsedInstructions = instructions
+      ? instructions.split(/[,\n]/).map(i => i.trim()).filter(i => i.length > 0)
+      : [];
+
     const recipe = new Recipe({
       userId: req.user._id,
       title,
-      ingredients: ingredients.split(","),
-      instructions: instructions.split(","),
+      ingredients: parsedIngredients,
+      instructions: parsedInstructions,
       prepTime,
       cookTime,
       servings,
@@ -180,7 +216,6 @@ router.get("/admin", async (req, res) => {
   }
 });
 
-
 // Approve Recipe
 router.patch("/admin/approve/:id", adminAuthCheck, async (req, res) => {
   try {
@@ -270,5 +305,29 @@ router.get("/user/approved", authCheck, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+// Add this route after the reject recipe route
+//move to pending
+router.post("/admin/pending/:id", adminAuthCheck, async (req, res) => {
+  try {
+    const recipeId = req.params.id;
+
+    const updatedRecipe = await Recipe.findByIdAndUpdate(
+      recipeId,
+      { status: "pending" },
+      { new: true }
+    );
+
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    res.status(200).json(updatedRecipe);
+  } catch (error) {
+    console.error("❌ Error moving recipe to pending:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 module.exports = router;

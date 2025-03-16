@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Check, X, ChevronDown, ChevronUp, RotateCw, Heart, Star } from "lucide-react";
+import { Check, X, ChevronDown, ChevronUp, RotateCw, Heart, Star, RotateCcw } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -11,6 +11,7 @@ const AdminDashboard = () => {
   const token = localStorage.getItem("token");
   const [expandedRecipe, setExpandedRecipe] = useState(null);
   const [pendingRecipes, setPendingRecipes] = useState([]);
+  const [rejectedRecipes, setRejectedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +29,8 @@ const AdminDashboard = () => {
         if (!response.ok) throw new Error("Failed to fetch recipes");
 
         const data = await response.json();
-        setPendingRecipes(data);
+        setPendingRecipes(data.filter(recipe => recipe.status === "pending"));
+        setRejectedRecipes(data.filter(recipe => recipe.status === "rejected"));
       } catch (error) {
         console.error("❌ Error fetching recipes:", error);
       } finally {
@@ -58,10 +60,25 @@ const AdminDashboard = () => {
         throw new Error(errorData.message || `Failed to ${action} recipe`);
       }
 
-      setPendingRecipes((recipes) =>
-        recipes.filter((recipe) => recipe._id !== recipeId)
-      );
-      setExpandedRecipe(null); // Close modal after action
+      // Update both pending and rejected lists based on the action
+      if (action === "approve") {
+        setPendingRecipes(recipes => recipes.filter(recipe => recipe._id !== recipeId));
+        setRejectedRecipes(recipes => recipes.filter(recipe => recipe._id !== recipeId));
+      } else if (action === "reject") {
+        setPendingRecipes(recipes => recipes.filter(recipe => recipe._id !== recipeId));
+        const recipe = pendingRecipes.find(r => r._id === recipeId);
+        if (recipe) {
+          setRejectedRecipes(prev => [...prev, { ...recipe, status: "rejected" }]);
+        }
+      } else if (action === "pending") {
+        setRejectedRecipes(recipes => recipes.filter(recipe => recipe._id !== recipeId));
+        const recipe = rejectedRecipes.find(r => r._id === recipeId);
+        if (recipe) {
+          setPendingRecipes(prev => [...prev, { ...recipe, status: "pending" }]);
+        }
+      }
+      
+      setExpandedRecipe(null);
     } catch (error) {
       console.error(`❌ Error ${action}ing recipe:`, error);
       alert(`Failed to ${action} recipe. Please try again.`);
@@ -82,8 +99,102 @@ const AdminDashboard = () => {
     return `http://localhost:5001/${normalizedPath}`;
   };
 
+  const RecipeList = ({ recipes, type }) => {
+    if (loading) {
+      return (
+        <div className="text-center py-8">
+          <RotateCw className="w-8 h-8 animate-spin text-white/50 mx-auto" />
+          <p className="text-white/80 mt-2">Loading recipes...</p>
+        </div>
+      );
+    }
+
+    if (recipes.length === 0) {
+      return (
+        <div className="text-center py-12 bg-white/5 rounded-xl border border-white/10">
+          <p className="text-white/80 text-lg">
+            No {type.toLowerCase()} recipes to review
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {recipes.map((recipe) => (
+          <div
+            key={recipe._id}
+            className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden transform transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer border border-white/10 group"
+            onClick={() => handleRecipeClick(recipe)}
+          >
+            <div className="p-4">
+              <div className="flex gap-4 items-center">
+                <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 shadow-lg transform group-hover:scale-105 transition-transform duration-300">
+                  <img
+                    src={getImageUrl(recipe.image)}
+                    alt={recipe.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold truncate pr-4">
+                      {recipe.title}
+                    </h3>
+                    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleStatusUpdate(recipe._id, "approve")}
+                        className="p-2 bg-green-500/20 rounded-full hover:bg-green-500/40 transition-all duration-300 transform hover:scale-110 active:scale-95 hover:shadow-lg hover:shadow-green-500/20"
+                        title="Approve recipe"
+                      >
+                        <Check className="w-4 h-4 text-green-400" />
+                      </button>
+                      {type === "Pending" ? (
+                        <button
+                          onClick={() => handleStatusUpdate(recipe._id, "reject")}
+                          className="p-2 bg-red-500/20 rounded-full hover:bg-red-500/40 transition-all duration-300 transform hover:scale-110 active:scale-95 hover:shadow-lg hover:shadow-red-500/20"
+                          title="Reject recipe"
+                        >
+                          <X className="w-4 h-4 text-red-400" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleStatusUpdate(recipe._id, "pending")}
+                          className="p-2 bg-blue-500/20 rounded-full hover:bg-blue-500/40 transition-all duration-300 transform hover:scale-110 active:scale-95 hover:shadow-lg hover:shadow-blue-500/20"
+                          title="Move to pending"
+                        >
+                          <RotateCcw className="w-4 h-4 text-blue-400" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-white/60">By</p>
+                      <p className="font-medium truncate">{recipe.userId.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60">Time</p>
+                      <p className="font-medium">{recipe.prepTime + recipe.cookTime} min</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60">Calories</p>
+                      <p className="font-medium">{recipe.caloriesPerServing}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen pt-24 pb-12 ">
+    <div className="min-h-screen pt-24 pb-12">
       <div className="page-transition max-w-5xl mx-auto px-4">
         <div className="flex flex-col items-center mb-12">
           <div className="relative">
@@ -94,96 +205,47 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl overflow-hidden transform perspective-1000">
-          <CardHeader className="pb-4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-2xl font-semibold text-white">
-                Pending Recipes
-              </CardTitle>
-              <div className="flex items-center">
-                <div className="animate-pulse mr-2 w-2 h-2 rounded-full bg-green-400"></div>
-                <span className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium border border-white/20">
-                  {pendingRecipes.length} recipes
-                </span>
+        <div className="space-y-8">
+          {/* Pending Recipes Card */}
+          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl overflow-hidden transform perspective-1000">
+            <CardHeader className="pb-4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-2xl font-semibold text-white">
+                  Pending Recipes
+                </CardTitle>
+                <div className="flex items-center">
+                  <div className="animate-pulse mr-2 w-2 h-2 rounded-full bg-yellow-400"></div>
+                  <span className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium border border-white/20">
+                    {pendingRecipes.length} recipes
+                  </span>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            {loading ? (
-              <div className="text-center py-8">
-                <RotateCw className="w-8 h-8 animate-spin text-white/50 mx-auto" />
-                <p className="text-white/80 mt-2">Loading recipes...</p>
-              </div>
-            ) : pendingRecipes.length > 0 ? (
-              <div className="space-y-4">
-                {pendingRecipes.map((recipe) => (
-                  <div
-                    key={recipe._id}
-                    className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden transform transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer border border-white/10 group"
-                    onClick={() => handleRecipeClick(recipe)}
-                  >
-                    <div className="p-4">
-                      <div className="flex gap-4 items-center">
-                        <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 shadow-lg transform group-hover:scale-105 transition-transform duration-300">
-                          <img
-                            src={getImageUrl(recipe.image)}
-                            alt={recipe.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <RecipeList recipes={pendingRecipes} type="Pending" />
+            </CardContent>
+          </Card>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-lg font-semibold truncate pr-4">
-                              {recipe.title}
-                            </h3>
-                            <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                onClick={() => handleStatusUpdate(recipe._id, "approve")}
-                                className="p-2 bg-green-500/20 rounded-full hover:bg-green-500/40 transition-all duration-300 transform hover:scale-110 active:scale-95 hover:shadow-lg hover:shadow-green-500/20"
-                                title="Approve recipe"
-                              >
-                                <Check className="w-4 h-4 text-green-400" />
-                              </button>
-                              <button
-                                onClick={() => handleStatusUpdate(recipe._id, "reject")}
-                                className="p-2 bg-red-500/20 rounded-full hover:bg-red-500/40 transition-all duration-300 transform hover:scale-110 active:scale-95 hover:shadow-lg hover:shadow-red-500/20"
-                                title="Reject recipe"
-                              >
-                                <X className="w-4 h-4 text-red-400" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="text-white/60">By</p>
-                              <p className="font-medium truncate">{recipe.userId.name}</p>
-                            </div>
-                            <div>
-                              <p className="text-white/60">Time</p>
-                              <p className="font-medium">{recipe.prepTime + recipe.cookTime} min</p>
-                            </div>
-                            <div>
-                              <p className="text-white/60">Calories</p>
-                              <p className="font-medium">{recipe.caloriesPerServing}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          {/* Rejected Recipes Card */}
+          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl overflow-hidden transform perspective-1000">
+            <CardHeader className="pb-4 bg-gradient-to-r from-red-800/50 to-pink-800/50">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-2xl font-semibold text-white">
+                  Rejected Recipes
+                </CardTitle>
+                <div className="flex items-center">
+                  <div className="animate-pulse mr-2 w-2 h-2 rounded-full bg-red-400"></div>
+                  <span className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium border border-white/20">
+                    {rejectedRecipes.length} recipes
+                  </span>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-12 bg-white/5 rounded-xl border border-white/10">
-                <p className="text-white/80 text-lg">
-                  No pending recipes to review
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="p-6">
+              <RecipeList recipes={rejectedRecipes} type="Rejected" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Recipe Details Modal */}
@@ -243,13 +305,23 @@ const AdminDashboard = () => {
                     <Check className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     Approve
                   </button>
-                  <button
-                    onClick={() => handleStatusUpdate(expandedRecipe._id, "reject")}
-                    className="flex-1 py-2 px-4 bg-red-500/20 rounded-lg hover:bg-red-500/30 transition-all duration-300 flex items-center justify-center gap-2 group hover:shadow-lg hover:shadow-red-500/20"
-                  >
-                    <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    Reject
-                  </button>
+                  {expandedRecipe.status === "pending" ? (
+                    <button
+                      onClick={() => handleStatusUpdate(expandedRecipe._id, "reject")}
+                      className="flex-1 py-2 px-4 bg-red-500/20 rounded-lg hover:bg-red-500/30 transition-all duration-300 flex items-center justify-center gap-2 group hover:shadow-lg hover:shadow-red-500/20"
+                    >
+                      <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      Reject
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleStatusUpdate(expandedRecipe._id, "pending")}
+                      className="flex-1 py-2 px-4 bg-blue-500/20 rounded-lg hover:bg-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2 group hover:shadow-lg hover:shadow-blue-500/20"
+                    >
+                      <RotateCcw className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      Move to Pending
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
