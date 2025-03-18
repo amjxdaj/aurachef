@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-import useRecipeData from "../hooks/UseRecipeData";
+import useRecipeData from "../hooks/useRecipeData";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import RecipeCard from "../components/profile/RecipeCard";
 import MyRecipeCard from "../components/profile/MyRecipeCard";
