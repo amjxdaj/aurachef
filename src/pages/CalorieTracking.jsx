@@ -5,7 +5,7 @@ import FoodEntryForm from '../components/calorie-tracking/FoodEntryForm';
 import FoodLogTable from '../components/calorie-tracking/FoodLogTable';
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import BMIMeter from '../components/calorie-tracking/BMIMETER';
+import BMIMeter from '../components/calorie-tracking/BMIMeter';
 
 const API_URL = "http://localhost:5001/api";
 
