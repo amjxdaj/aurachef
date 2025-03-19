@@ -30,7 +30,7 @@ const Profile = () => {
   const handleDeleteRecipe = async (recipeId) => {
     try {
       // First, delete the recipe
-      const deleteResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recipe/delete/${recipeId}`, {
+      const deleteResponse = await fetch(`https://aurachef-backend.vercel.app/api/recipe/delete/${recipeId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ const Profile = () => {
       if (!deleteResponse.ok) throw new Error('Failed to delete recipe');
 
       // Remove recipe from favorites collection
-      const removeFavResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/favourites/remove/${recipeId}`, {
+      const removeFavResponse = await fetch(`https://aurachef-backend.vercel.app/api/favourites/remove/${recipeId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ const Profile = () => {
       if (!removeFavResponse.ok) throw new Error('Failed to remove from favorites');
 
       // Remove recipe ratings
-      const removeRatingsResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/rating/remove/${recipeId}`, {
+      const removeRatingsResponse = await fetch(`https://aurachef-backend.vercel.app/api/rating/remove/${recipeId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ const Profile = () => {
     }
 
     try {
-      const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle", {
+      const response = await fetch("https://aurachef-backend.vercel.app/api/favourites/toggle", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +110,7 @@ const Profile = () => {
     }
 
     try {
-      const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/rating/rate", {
+      const response = await fetch("https://aurachef-backend.vercel.app/api/rating/rate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

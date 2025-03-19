@@ -54,7 +54,7 @@ const AddRecipe = () => {
     }
 
     try {
-      const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/recipe/create", {
+      const response = await fetch("https://aurachef-backend.vercel.app/api/recipe/create", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

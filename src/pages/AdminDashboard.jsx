@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     const fetchRecipes = async () => {
       try {
         setLoading(true);
-        const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/recipe/admin", {
+        const response = await fetch("https://aurachef-backend.vercel.app/api/recipe/admin", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
     try {
       const method = action === "approve" ? "PATCH" : "POST";
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/recipe/admin/${action}/${recipeId}`,
+        `https://aurachef-backend.vercel.app/api/recipe/admin/${action}/${recipeId}`,
         {
           method: method,
           headers: {
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "https://images.unsplash.com/photo-1635321593217-40050ad13c74?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3";
     const normalizedPath = imagePath.replace(/\\/g, '/');
-    return `${import.meta.env.VITE_API_BASE_URL}/${normalizedPath}`;
+    return `https://aurachef-backend.vercel.app/${normalizedPath}`;
   };
 
   const RecipeList = ({ recipes, type }) => {

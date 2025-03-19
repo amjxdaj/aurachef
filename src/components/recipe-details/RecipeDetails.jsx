@@ -12,7 +12,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
     const fetchRecipeDetails = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/recipe/details/${expandedRecipe._id}`,
+          `https://aurachef-backend.vercel.app/api/recipe/details/${expandedRecipe._id}`,
           {
             method: "GET",
             headers: {
@@ -36,7 +36,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
     const fetchFavoriteStatus = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/favourites/status/${expandedRecipe._id}`,
+          `https://aurachef-backend.vercel.app/api/favourites/status/${expandedRecipe._id}`,
           {
             method: "GET",
             headers: {
@@ -67,7 +67,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
       return;
     }
     try {
-      const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/rating/rate", {
+      const response = await fetch("https://aurachef-backend.vercel.app/api/rating/rate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +101,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
 
     try {
       const response = await fetch(
-        "${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle",
+        "https://aurachef-backend.vercel.app/api/favourites/toggle",
         {
           method: "POST",
           headers: {
@@ -141,7 +141,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
           <div className="md:w-1/2">
             <div className="rounded-lg overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
               <img
-                src={"${import.meta.env.VITE_API_BASE_URL}/" + expandedRecipe.image}
+                src={"https://aurachef-backend.vercel.app/" + expandedRecipe.image}
                 alt={expandedRecipe.title}
                 className="w-full h-64 object-cover"
               />

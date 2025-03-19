@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import BMIMeter from '../components/calorie-tracking/BMIMeter';
 
-const API_URL = "${import.meta.env.VITE_API_BASE_URL}/api";
+const API_URL = "https://aurachef-backend.vercel.app/api";
 
 const CalorieTracking = () => {
   const { user } = useAuth();
