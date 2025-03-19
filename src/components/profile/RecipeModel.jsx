@@ -12,7 +12,7 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
     const fetchRecipeDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/recipe/details/${recipe._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/recipe/details/${recipe._id}`,
           {
             method: "GET",
             headers: {
@@ -36,7 +36,7 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
     const fetchFavoriteStatus = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/favourites/status/${recipe._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/favourites/status/${recipe._id}`,
           {
             method: "GET",
             headers: {
@@ -67,7 +67,7 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
       return;
     }
     try {
-      const response = await fetch("http://localhost:5001/api/rating/rate", {
+      const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/rating/rate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -100,7 +100,7 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
     }
 
     try {
-      const response = await fetch("http://localhost:5001/api/favourites/toggle", {
+      const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -133,7 +133,7 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
           <div className="md:w-1/2">
             <div className="rounded-lg overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
               <img
-                src={recipe.image ? `http://localhost:5001/${recipe.image}` : recipe.image}
+                src={recipe.image ? `${import.meta.env.VITE_API_BASE_URL}/${recipe.image}` : recipe.image}
                 alt={recipe.title || recipe.name}
                 className="w-full h-64 object-cover"
               />

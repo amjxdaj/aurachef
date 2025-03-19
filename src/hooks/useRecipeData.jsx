@@ -9,7 +9,7 @@ const useRecipeData = (user, token) => {
     const fetchData = async () => {
       try {
         // Fetch favorited recipes
-        const favResponse = await fetch(`http://localhost:5001/api/favourites`, {
+        const favResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/favourites`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!favResponse.ok) throw new Error("Failed to fetch favorited recipes");
@@ -19,7 +19,7 @@ const useRecipeData = (user, token) => {
         setFavoritedRecipes(validFavorites);
 
         // Fetch user's recipes
-        const recipesResponse = await fetch(`http://localhost:5001/api/recipe/user/approved`, {
+        const recipesResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recipe/user/approved`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!recipesResponse.ok) throw new Error("Failed to fetch user recipes");

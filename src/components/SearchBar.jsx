@@ -50,7 +50,7 @@ const SearchBar = ({ onSearch }) => {
   useEffect(() => {
     const fetchAvailableIncrediant = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/recipe/incredients", {
+        const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/recipe/incredients", {
           method: "GET",
           headers: {
             "Content-Type": "application/json"

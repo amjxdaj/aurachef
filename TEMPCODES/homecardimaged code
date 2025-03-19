@@ -16,7 +16,7 @@ const Home = () => {
   const handleSearch = async (searchIngredients) => {
     console.log('Searching for ingredients:', searchIngredients);
     try {
-      const response = await fetch("http://localhost:5001/api/recipe/search", {
+      const response = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/recipe/search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -73,7 +73,7 @@ const Home = () => {
                 >
                   <div className="relative mb-4 rounded-lg overflow-hidden">
                     <img
-                      src={`http://localhost:5001/${recipe.image}`}
+                      src={`${import.meta.env.VITE_API_BASE_URL}/${recipe.image}`}
                       alt={recipe.title}
                       className="w-full h-48 object-cover"
                     />

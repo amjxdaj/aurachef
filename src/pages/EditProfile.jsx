@@ -37,7 +37,7 @@ const EditProfile = () => {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/users/profile', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/users/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -100,7 +100,7 @@ const EditProfile = () => {
         formData.append('avatar', profile.avatar);
       }
 
-      const response = await fetch('http://localhost:5001/api/users/profile', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/users/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
