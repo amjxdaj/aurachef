@@ -43,7 +43,7 @@ const TDEECalculator = ({ onCalorieGoalChange, onUserMetricsChange }) => {
         height: parseFloat(userDetails.height)
       });
     }
-  }, [userDetails.weight, userDetails.height, onUserMetricsChange]);
+  }, [userDetails.weight, userDetails.height]);
 
   const calculateBMR = () => {
     const { age, weight, height, gender } = userDetails;

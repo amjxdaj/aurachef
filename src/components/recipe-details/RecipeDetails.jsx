@@ -101,7 +101,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
 
     try {
       const response = await fetch(
-        "${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle",
+        `${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle`,
         {
           method: "POST",
           headers: {

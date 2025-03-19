@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../context/AuthProvider"; 
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -11,6 +13,7 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +45,21 @@ const Signup = () => {
       }
   
       console.log("Signup successful:", data);
-      navigate("/");
+      localStorage.setItem("token", data.token);
+      
+            // Decode user details from the token
+            const decodedUser = jwtDecode(data.token);
+            console.log("Decoded User:", decodedUser);
+      
+            // ✅ Update Auth Context so other pages recognize login
+            login(data.token);
+      
+            // ✅ Redirect based on role (with error handling)
+            if (decodedUser.isAdmin) {
+              navigate("/admin-dashboard");
+            } else {
+              navigate("/profile");
+            }
   
     } catch (error) {
       setError(error.message); // Display the error message from the server

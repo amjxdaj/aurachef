@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import BMIMeter from '../components/calorie-tracking/BMIMeter';
 
-const API_URL = "${import.meta.env.VITE_API_BASE_URL}/api";
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 const CalorieTracking = () => {
   const { user } = useAuth();
@@ -180,49 +180,30 @@ const CalorieTracking = () => {
     }
   };
 
-  const handleReset = async () => {
-    if (!window.confirm('Are you sure you want to reset all food logs and calorie goals? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      
-      // First reset the daily goal
-      const goalResponse = await fetch(`${API_URL}/calories/calorie-goal`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ dailyGoal: 2000 }),
-      });
-
-      if (!goalResponse.ok) {
-        throw new Error('Failed to reset calorie goal');
+  // Client-side reset function
+const handleReset = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/calories/food-log-reset`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
       }
-
-      // Then delete all food logs
-      const logsResponse = await fetch(`${API_URL}/calories/food-log/reset`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      });
-
-      if (!logsResponse.ok) {
-        throw new Error('Failed to reset food logs');
-      }
-
-      setEntries([]);
-      setCalorieGoal(2000);
-      setError('');
-    } catch (error) {
-      console.error("❌ Error resetting data:", error);
-      setError('Failed to reset data: ' + error.message);
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to reset food logs");
     }
-  };
+    setEntries([]);
+    
+    // Handle successful reset
+    // E.g., clear state, show success message, etc.
+    
+  } catch (error) {
+    console.error("Error resetting data:", error);
+  }
+};
 
   const handleCalorieGoalChange = async (newGoal) => {
     try {
@@ -304,7 +285,7 @@ const CalorieTracking = () => {
             onClick={handleReset}
             className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
           >
-            Reset All Data
+            Reset All Food Logs
           </button>
         </div>
       </div>

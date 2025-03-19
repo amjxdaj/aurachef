@@ -93,30 +93,30 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
   };
 
   const handleFavoriteToggle = async () => {
-    if (!token) {
-      alert("You must be logged in to favorite recipes!");
-      window.location.href = "/login";
-      return;
-    }
+    // if (!token) {
+    //   alert("You must be logged in to favorite recipes!");
+    //   window.location.href = "/login";
+    //   return;
+    // }
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ recipeId: recipe._id }),
-      });
+    // try {
+    //   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //     body: JSON.stringify({ recipeId: recipe._id }),
+    //   });
 
-      if (!response.ok) throw new Error("Failed to update favorite status");
+    //   if (!response.ok) throw new Error("Failed to update favorite status");
 
-      const data = await response.json();
-      setFavorited(data.isFavorited);
+    //   const data = await response.json();
+      setFavorited(recipe.isFavorited);
       onFavoriteToggle(recipe._id);
-    } catch (error) {
-      console.error("❌ Error updating favorite:", error.message);
-    }
+    // } catch (error) {
+    //   console.error("❌ Error updating favorite:", error.message);
+    // }
   };
 
   if (!recipe || !recipe._id) return null;

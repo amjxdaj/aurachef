@@ -91,8 +91,8 @@ const BMIMeter = ({ weight, height }) => {
             </div>
           </div>
           
-          <div className="text-center text-sm">
-            <p>BMI = weight(kg) / height(m)²</p>
+          <div className="text-center text-sm flex flex-col gap-3 pt-7">
+            <p className="">BMI = weight(kg) / height(m)²</p>
             <p className="mt-1 text-white/70">
               BMI is a screening tool, not a diagnostic of body fatness or health.
             </p>
