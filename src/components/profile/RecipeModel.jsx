@@ -12,7 +12,7 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
     const fetchRecipeDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/recipe/details/${recipe._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/recipe/details/${recipe._id}`,
           {
             method: "GET",
             headers: {
@@ -36,7 +36,7 @@ const RecipeModel = ({ recipe, onClose, onFavoriteToggle, isFavorited: initialFa
     const fetchFavoriteStatus = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/favourites/status/${recipe._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/favourites/status/${recipe._id}`,
           {
             method: "GET",
             headers: {

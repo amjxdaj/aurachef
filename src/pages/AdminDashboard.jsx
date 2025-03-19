@@ -45,7 +45,7 @@ const AdminDashboard = () => {
     try {
       const method = action === "approve" ? "PATCH" : "POST";
       const response = await fetch(
-        `http://localhost:5001/api/recipe/admin/${action}/${recipeId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/recipe/admin/${action}/${recipeId}`,
         {
           method: method,
           headers: {
@@ -93,11 +93,11 @@ const AdminDashboard = () => {
     setExpandedRecipe(null);
   };
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "https://images.unsplash.com/photo-1635321593217-40050ad13c74?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3";
-    const normalizedPath = imagePath.replace(/\\/g, '/');
-    return `http://localhost:5001/${normalizedPath}`;
-  };
+  // const getImageUrl = (imagePath) => {
+  //   if (!imagePath) return "https://images.unsplash.com/photo-1635321593217-40050ad13c74?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3";
+  //   const normalizedPath = imagePath.replace(/\\/g, '/');
+  //   return `${import.meta.env.VITE_API_BASE_URL}/${normalizedPath}`;
+  // };
 
   const RecipeList = ({ recipes, type }) => {
     if (loading) {

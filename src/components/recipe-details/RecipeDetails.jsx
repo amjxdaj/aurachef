@@ -12,7 +12,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
     const fetchRecipeDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/recipe/details/${expandedRecipe._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/recipe/details/${expandedRecipe._id}`,
           {
             method: "GET",
             headers: {
@@ -36,7 +36,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
     const fetchFavoriteStatus = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/favourites/status/${expandedRecipe._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/favourites/status/${expandedRecipe._id}`,
           {
             method: "GET",
             headers: {
@@ -101,7 +101,7 @@ function RecipeDetails({ expandedRecipe, handleCloseExpanded }) {
 
     try {
       const response = await fetch(
-        "http://localhost:5001/api/favourites/toggle",
+        "${import.meta.env.VITE_API_BASE_URL}/api/favourites/toggle",
         {
           method: "POST",
           headers: {
