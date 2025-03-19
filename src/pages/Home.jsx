@@ -17,7 +17,7 @@ const Home = () => {
   const handleSearch = async (searchIngredients) => {
     console.log('Searching for ingredients:', searchIngredients);
     try {
-      const response = await fetch("https://aurachef-backend.vercel.app/api/recipe/search", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recipe/search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

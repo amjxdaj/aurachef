@@ -9,7 +9,7 @@ const useRecipeData = (user, token) => {
     const fetchData = async () => {
       try {
         // Fetch favorited recipes
-        const favResponse = await fetch(`https://aurachef-backend.vercel.app/api/favourites`, {
+        const favResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/favourites`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!favResponse.ok) throw new Error("Failed to fetch favorited recipes");
@@ -19,7 +19,7 @@ const useRecipeData = (user, token) => {
         setFavoritedRecipes(validFavorites);
 
         // Fetch user's recipes
-        const recipesResponse = await fetch(`https://aurachef-backend.vercel.app/api/recipe/user/approved`, {
+        const recipesResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recipe/user/approved`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!recipesResponse.ok) throw new Error("Failed to fetch user recipes");

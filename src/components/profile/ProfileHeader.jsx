@@ -15,7 +15,7 @@ const ProfileHeader = ({ user, onEditProfile, onLogout }) => {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://aurachef-backend.vercel.app/api/users/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -23,6 +23,7 @@ const ProfileHeader = ({ user, onEditProfile, onLogout }) => {
       
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
         setProfile({
           username: data.username || '',
           bio: data.bio || '',

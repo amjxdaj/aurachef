@@ -26,7 +26,7 @@ const MyRecipeCard = ({ recipe, onDelete, onClick }) => {
         <div className="relative rounded-xl overflow-hidden mb-4 group">
       
           <img
-            src={`https://aurachef-backend.vercel.app/${recipe.image}`}
+            src={`$recipe.image`}
             alt={recipe.title}
             className="w-full h-48 object-cover"
           />

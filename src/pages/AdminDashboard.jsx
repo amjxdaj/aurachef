@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     const fetchRecipes = async () => {
       try {
         setLoading(true);
-        const response = await fetch("https://aurachef-backend.vercel.app/api/recipe/admin", {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recipe/admin`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
     try {
       const method = action === "approve" ? "PATCH" : "POST";
       const response = await fetch(
-        `https://aurachef-backend.vercel.app/api/recipe/admin/${action}/${recipeId}`,
+        `http://localhost:5001/api/recipe/admin/${action}/${recipeId}`,
         {
           method: method,
           headers: {
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "https://images.unsplash.com/photo-1635321593217-40050ad13c74?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3";
     const normalizedPath = imagePath.replace(/\\/g, '/');
-    return `https://aurachef-backend.vercel.app/${normalizedPath}`;
+    return `http://localhost:5001/${normalizedPath}`;
   };
 
   const RecipeList = ({ recipes, type }) => {
@@ -131,7 +131,7 @@ const AdminDashboard = () => {
               <div className="flex gap-4 items-center">
                 <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 shadow-lg transform group-hover:scale-105 transition-transform duration-300">
                   <img
-                    src={getImageUrl(recipe.image)}
+                    src={recipe.image}
                     alt={recipe.title}
                     className="w-full h-full object-cover"
                   />
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
               <div className="md:w-1/2">
                 <div className="rounded-lg overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
                   <img
-                    src={getImageUrl(expandedRecipe.image)}
+                    src={expandedRecipe.image}
                     alt={expandedRecipe.title}
                     className="w-full h-64 object-cover"
                   />

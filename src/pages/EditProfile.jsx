@@ -1,129 +1,166 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Upload } from 'lucide-react';
-import { useAuth } from '../context/AuthProvider';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { User, Upload } from "lucide-react";
+import { useAuth } from "../context/AuthProvider";
 
 const EditProfile = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef(null);
-  
+
   const [profile, setProfile] = useState({
-    username: user?.username || '',
-    email: user?.email || '',
-    bio: '',
-    avatar: null
+    username: user?.username || "",
+    email: user?.email || "",
+    bio: "",
+    avatar: null,
   });
 
   useEffect(() => {
     if (!user && !loading) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     if (user) {
-      setProfile(prev => ({
+      setProfile((prev) => ({
         ...prev,
-        username: user.username || '',
-        email: user.email || ''
+        username: user.username || "",
+        email: user.email || "",
       }));
-      
+
       fetchUserProfile();
     }
   }, [user, loading, navigate]);
 
   const fetchUserProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://aurachef-backend.vercel.app/api/users/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-      
+      );
+
       if (response.ok) {
         const data = await response.json();
-        setProfile(prev => ({
+        setProfile((prev) => ({
           ...prev,
           username: data.username || prev.username,
           email: data.email || prev.email,
-          bio: data.bio || '',
-          avatar: data.avatar || null
+          bio: data.bio || "",
+          avatar: data.avatar || null,
         }));
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Failed to fetch profile');
+        setError(errorData.message || "Failed to fetch profile");
       }
     } catch (error) {
-      console.error('Error fetching profile:', error);
-      setError('Failed to load profile data');
+      console.error("Error fetching profile:", error);
+      setError("Failed to load profile data");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile(prev => ({ ...prev, [name]: value }));
-    setError('');
+    setProfile((prev) => ({ ...prev, [name]: value }));
+    setError("");
   };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setProfile(prev => ({ ...prev, avatar: file }));
+      setProfile((prev) => ({ ...prev, avatar: file }));
     }
   };
 
   const resetForm = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
     fetchUserProfile();
+  };
+
+  // Upload image to Cloudinary
+  const handleImageUpload = async (file) => {
+    if (!file) return null;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "aurachef"); // Using the same preset as in original code
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dcgmvwfll/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Cloudinary Response:", data);
+
+      return data.secure_url || null;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    setError('');
-    
+    setError("");
+
     try {
-      const token = localStorage.getItem('token');
-      const formData = new FormData();
-      
-      // Append all profile data to FormData
-      formData.append('username', profile.username);
-      formData.append('bio', profile.bio || '');
-      
+      const token = localStorage.getItem("token");
+      let imageUrl = "";
       // Only append avatar if it's a File object (new upload)
       if (profile.avatar instanceof File) {
-        formData.append('avatar', profile.avatar);
+        imageUrl = await handleImageUpload(profile.avatar);
       }
 
-      const response = await fetch('https://aurachef-backend.vercel.app/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            username: profile.username,
+            bio: profile.bio,
+            avatar: imageUrl ? imageUrl : "",
+          }),
+        }
+      );
 
       if (response.ok) {
         const updatedUser = await response.json();
-        setProfile(prev => ({
+        setProfile((prev) => ({
           ...prev,
           username: updatedUser.username,
           bio: updatedUser.bio,
-          avatar: updatedUser.avatar
+          avatar: updatedUser.avatar,
         }));
-        navigate('/profile');
+        navigate("/profile");
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Failed to update profile');
+        setError(errorData.message || "Failed to update profile");
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
-      setError('Failed to save changes');
+      console.error("Error updating profile:", error);
+      setError("Failed to save changes");
     } finally {
       setIsSaving(false);
     }
@@ -145,15 +182,23 @@ const EditProfile = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-8" encType="multipart/form-data">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-8"
+            encType="multipart/form-data"
+          >
             <div className="flex flex-col md:flex-row gap-8">
               <div className="flex flex-col items-center">
                 <div className="relative w-40 h-40 mb-4 rounded-2xl overflow-hidden transform perspective-1000 transition-transform hover:scale-105">
                   <div className="absolute inset-0 bg-gradient-to-b from-black/0 to-black/50"></div>
                   {profile.avatar ? (
-                    <img 
-                      src={profile.avatar instanceof File ? URL.createObjectURL(profile.avatar) : profile.avatar}
-                      alt="Profile" 
+                    <img
+                      src={
+                        profile.avatar instanceof File
+                          ? URL.createObjectURL(profile.avatar)
+                          : profile.avatar
+                      }
+                      alt="Profile"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -162,7 +207,7 @@ const EditProfile = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <label className="relative group cursor-pointer">
                   <input
                     ref={fileInputRef}
@@ -177,10 +222,13 @@ const EditProfile = () => {
                   </div>
                 </label>
               </div>
-              
+
               <div className="flex-1 space-y-6">
                 <div>
-                  <label htmlFor="username" className="block text-white font-medium mb-2">
+                  <label
+                    htmlFor="username"
+                    className="block text-white font-medium mb-2"
+                  >
                     Username
                   </label>
                   <input
@@ -193,9 +241,12 @@ const EditProfile = () => {
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label htmlFor="email" className="block text-white font-medium mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-white font-medium mb-2"
+                  >
                     Email
                   </label>
                   <input
@@ -207,9 +258,12 @@ const EditProfile = () => {
                     className="w-full bg-white/10 border border-white/20 px-4 py-3 rounded-xl text-white/70 cursor-not-allowed"
                   />
                 </div>
-                
+
                 <div>
-                  <label htmlFor="bio" className="block text-white font-medium mb-2">
+                  <label
+                    htmlFor="bio"
+                    className="block text-white font-medium mb-2"
+                  >
                     Bio
                   </label>
                   <textarea
@@ -224,11 +278,11 @@ const EditProfile = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-4 pt-6">
               <button
                 type="button"
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate("/profile")}
                 className="px-6 py-3 rounded-xl bg-white/5 text-white hover:bg-white/10 transition-all duration-200 transform hover:translate-y-[-2px] active:translate-y-0"
               >
                 Cancel
@@ -238,7 +292,7 @@ const EditProfile = () => {
                 disabled={isSaving}
                 className="px-8 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 shadow-lg transform transition-all duration-200 hover:translate-y-[-2px] hover:shadow-xl active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSaving ? 'Saving...' : 'Save Changes'}
+                {isSaving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>

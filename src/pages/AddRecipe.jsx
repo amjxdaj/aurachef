@@ -45,21 +45,58 @@ const AddRecipe = () => {
     }
   };
 
+  // Upload image to Cloudinary
+  const handleImageUpload = async (file) => {
+    if (!file) return null;
+  
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", 'aurachef'); // Using the same preset as in original code
+  
+    try {
+      const response = await fetch('https://api.cloudinary.com/v1_1/dcgmvwfll/image/upload', {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log("Cloudinary Response:", data);
+  
+      return data.secure_url || null;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    const formData = new FormData();
-    for (const key in recipe) {
-      formData.append(key, recipe[key]);
-    }
+    const imageUrl = await handleImageUpload(recipe.image);
+    
+    const formData = {
+      title: recipe.title,
+      ingredients: recipe.ingredients,
+      instructions: recipe.instructions,
+      prepTime: recipe.prepTime,
+      cookTime: recipe.cookTime,
+      servings: recipe.servings,
+      caloriesPerServing: recipe.caloriesPerServing,
+      image: imageUrl,
+    };
 
     try {
-      const response = await fetch("https://aurachef-backend.vercel.app/api/recipe/create", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recipe/create`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Add this header
+          "Authorization": `Bearer ${token}`,
         },
-        body: formData,
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
