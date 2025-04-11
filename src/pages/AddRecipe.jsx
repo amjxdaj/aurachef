@@ -5,7 +5,12 @@ import { useNavigate } from "react-router-dom";
 const AddRecipe = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null); // Add ref for file input
+  const fileInputRef = useRef(null);
+  
+  const [notification, setNotification] = useState({
+    show: false,
+    message: ''
+  });
   
   const [recipe, setRecipe] = useState({
     title: "",
@@ -39,19 +44,17 @@ const AddRecipe = () => {
       caloriesPerServing: "",
       image: null,
     });
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  // Upload image to Cloudinary
   const handleImageUpload = async (file) => {
     if (!file) return null;
   
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", 'aurachef'); // Using the same preset as in original code
+    formData.append("upload_preset", 'aurachef');
   
     try {
       const response = await fetch('https://api.cloudinary.com/v1_1/dcgmvwfll/image/upload', {
@@ -93,7 +96,7 @@ const AddRecipe = () => {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recipe/create`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", // Add this header
+          "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
@@ -101,7 +104,14 @@ const AddRecipe = () => {
 
       const data = await response.json();
       if (response.ok) {
-        resetForm(); // Use the new reset function
+        setNotification({
+          show: true,
+          message: 'Recipe added successfully! 🎉'
+        });
+        setTimeout(() => {
+          setNotification({ show: false, message: '' });
+        }, 3000);
+        resetForm();
       } else {
         console.error("❌ Failed to add recipe", data);
       }
@@ -117,7 +127,7 @@ const AddRecipe = () => {
   }, [user, navigate]);
   
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-24 pb-12 relative">
       <div className="page-transition max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-white text-shadow text-center mb-8">
           Add New Recipe
@@ -147,7 +157,7 @@ const AddRecipe = () => {
                   Recipe Image
                 </label>
                 <input
-                  ref={fileInputRef} // Add ref here
+                  ref={fileInputRef}
                   id="image"
                   name="image"
                   type="file"
@@ -171,7 +181,6 @@ const AddRecipe = () => {
                   onChange={handleChange}
                   className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
                   placeholder="15"
-                  // removed required
                 />
               </div>
 
@@ -187,7 +196,7 @@ const AddRecipe = () => {
                   onChange={handleChange}
                   className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
                   placeholder="30"
-                  required // Added required
+                  required
                 />
               </div>
 
@@ -218,7 +227,6 @@ const AddRecipe = () => {
                   onChange={handleChange}
                   className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
                   placeholder="4"
-                  // removed required
                 />
               </div>
             </div>
@@ -251,7 +259,6 @@ const AddRecipe = () => {
                 rows={6}
                 className="w-full glass bg-white/5 border border-white/20 px-4 py-2 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
                 placeholder="Enter cooking instructions step by step"
-                // removed required
               ></textarea>
             </div>
 
@@ -263,6 +270,12 @@ const AddRecipe = () => {
           </form>
         </div>
       </div>
+      
+      {notification.show && (
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-down">
+          {notification.message}
+        </div>
+      )}
     </div>
   );
 };

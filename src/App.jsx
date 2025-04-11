@@ -15,6 +15,7 @@ import EditProfile from "./pages/EditProfile";
 import AdminDashboard from "./pages/AdminDashboard";
 import AuthProvider, { useAuth } from "./context/AuthProvider"; // ✅ Correct import
 import ResetPassword from './pages/ResetPassword';
+import AdminUserHandle from "./pages/AdminUserHandle";
 
 const App = () => {
   return (
@@ -35,7 +36,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-
+            <Route path="/admin-user-handle" element={<AdminUserHandle/>}/>
             {/* ✅ Protect Admin Dashboard Route */}
             <Route path="/admin-dashboard" element={<ProtectedAdminRoute />} />
           </Routes>

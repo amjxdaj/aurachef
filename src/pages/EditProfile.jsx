@@ -123,7 +123,7 @@ const EditProfile = () => {
 
     try {
       const token = localStorage.getItem("token");
-      let imageUrl = "";
+      let imageUrl = profile.avatar;
       // Only append avatar if it's a File object (new upload)
       if (profile.avatar instanceof File) {
         imageUrl = await handleImageUpload(profile.avatar);
@@ -140,7 +140,7 @@ const EditProfile = () => {
           body: JSON.stringify({
             username: profile.username,
             bio: profile.bio,
-            avatar: imageUrl ? imageUrl : "",
+            avatar: imageUrl,
           }),
         }
       );
